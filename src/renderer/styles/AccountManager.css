@@ -1,0 +1,115 @@
+.account-manager {
+  padding: 20px;
+}
+
+.purchase-settings {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.setting-item {
+  margin: 10px 0;
+}
+
+.setting-item label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.setting-item input {
+  width: 80px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.add-account {
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.add-account input {
+  margin-right: 10px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.account-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.account-list th,
+.account-list td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.account-list th {
+  background-color: #f5f5f5;
+}
+
+.account-list button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #ff4d4f;
+  color: white;
+  cursor: pointer;
+}
+
+.account-list button:hover {
+  background-color: #ff7875;
+}
+
+.account-list .delete-button {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.account-list .delete-button:hover {
+  background-color: #ff7875;
+}
+
+.account-list .edit-button,
+.account-list .add-button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+
+.edit-button {
+  background-color: #1976d2;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #1565c0;
+}
+
+.add-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.add-button:hover {
+  background-color: #43a047;
+}
+
+.account-list td {
+  vertical-align: middle;
+}
+
+.account-list button {
+  margin: 0 4px;
+} 

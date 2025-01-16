@@ -1,0 +1,503 @@
+{
+    "zones": [
+        {
+            "code": "AL",
+            "name": "Alabama",
+            "nameWithAlternates": [
+                "Alabama"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "AK",
+            "name": "Alaska",
+            "nameWithAlternates": [
+                "Alaska"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "AS",
+            "name": "American Samoa",
+            "nameWithAlternates": [
+                "American Samoa"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "AZ",
+            "name": "Arizona",
+            "nameWithAlternates": [
+                "Arizona"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "AR",
+            "name": "Arkansas",
+            "nameWithAlternates": [
+                "Arkansas"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "CA",
+            "name": "California",
+            "nameWithAlternates": [
+                "California"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "CO",
+            "name": "Colorado",
+            "nameWithAlternates": [
+                "Colorado"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "CT",
+            "name": "Connecticut",
+            "nameWithAlternates": [
+                "Connecticut"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "DE",
+            "name": "Delaware",
+            "nameWithAlternates": [
+                "Delaware"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "FM",
+            "name": "Micronesia",
+            "nameWithAlternates": [
+                "Federated States of Micronesia",
+                "Micronesia"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "FL",
+            "name": "Florida",
+            "nameWithAlternates": [
+                "Florida"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "GA",
+            "name": "Georgia",
+            "nameWithAlternates": [
+                "Georgia"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "GU",
+            "name": "Guam",
+            "nameWithAlternates": [
+                "Guam"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "HI",
+            "name": "Hawaii",
+            "nameWithAlternates": [
+                "Hawaii"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "ID",
+            "name": "Idaho",
+            "nameWithAlternates": [
+                "Idaho"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "IL",
+            "name": "Illinois",
+            "nameWithAlternates": [
+                "Illinois"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "IN",
+            "name": "Indiana",
+            "nameWithAlternates": [
+                "Indiana"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "IA",
+            "name": "Iowa",
+            "nameWithAlternates": [
+                "Iowa"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "KS",
+            "name": "Kansas",
+            "nameWithAlternates": [
+                "Kansas"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "KY",
+            "name": "Kentucky",
+            "nameWithAlternates": [
+                "Kentucky"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "LA",
+            "name": "Louisiana",
+            "nameWithAlternates": [
+                "Louisiana"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "ME",
+            "name": "Maine",
+            "nameWithAlternates": [
+                "Maine"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MH",
+            "name": "Marshall Islands",
+            "nameWithAlternates": [
+                "Marshall Islands"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MD",
+            "name": "Maryland",
+            "nameWithAlternates": [
+                "Maryland"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MA",
+            "name": "Massachusetts",
+            "nameWithAlternates": [
+                "Massachusetts"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MI",
+            "name": "Michigan",
+            "nameWithAlternates": [
+                "Michigan"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MN",
+            "name": "Minnesota",
+            "nameWithAlternates": [
+                "Minnesota"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MS",
+            "name": "Mississippi",
+            "nameWithAlternates": [
+                "Mississippi"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MO",
+            "name": "Missouri",
+            "nameWithAlternates": [
+                "Missouri"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MT",
+            "name": "Montana",
+            "nameWithAlternates": [
+                "Montana"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "NE",
+            "name": "Nebraska",
+            "nameWithAlternates": [
+                "Nebraska"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "NV",
+            "name": "Nevada",
+            "nameWithAlternates": [
+                "Nevada"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "NH",
+            "name": "New Hampshire",
+            "nameWithAlternates": [
+                "New Hampshire"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "NJ",
+            "name": "New Jersey",
+            "nameWithAlternates": [
+                "New Jersey"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "NM",
+            "name": "New Mexico",
+            "nameWithAlternates": [
+                "New Mexico"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "NY",
+            "name": "New York",
+            "nameWithAlternates": [
+                "New York"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "NC",
+            "name": "North Carolina",
+            "nameWithAlternates": [
+                "North Carolina"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "ND",
+            "name": "North Dakota",
+            "nameWithAlternates": [
+                "North Dakota"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "MP",
+            "name": "Northern Mariana Islands",
+            "nameWithAlternates": [
+                "Northern Mariana Islands"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "OH",
+            "name": "Ohio",
+            "nameWithAlternates": [
+                "Ohio"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "OK",
+            "name": "Oklahoma",
+            "nameWithAlternates": [
+                "Oklahoma"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "OR",
+            "name": "Oregon",
+            "nameWithAlternates": [
+                "Oregon"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "PW",
+            "name": "Palau",
+            "nameWithAlternates": [
+                "Palau"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "PA",
+            "name": "Pennsylvania",
+            "nameWithAlternates": [
+                "Pennsylvania"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "PR",
+            "name": "Puerto Rico",
+            "nameWithAlternates": [
+                "Puerto Rico"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "RI",
+            "name": "Rhode Island",
+            "nameWithAlternates": [
+                "Rhode Island"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "SC",
+            "name": "South Carolina",
+            "nameWithAlternates": [
+                "South Carolina"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "SD",
+            "name": "South Dakota",
+            "nameWithAlternates": [
+                "South Dakota"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "TN",
+            "name": "Tennessee",
+            "nameWithAlternates": [
+                "Tennessee"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "TX",
+            "name": "Texas",
+            "nameWithAlternates": [
+                "Texas"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "UT",
+            "name": "Utah",
+            "nameWithAlternates": [
+                "Utah"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "VT",
+            "name": "Vermont",
+            "nameWithAlternates": [
+                "Vermont"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "VA",
+            "name": "Virginia",
+            "nameWithAlternates": [
+                "Virginia"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "WA",
+            "name": "Washington",
+            "nameWithAlternates": [
+                "Washington"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "DC",
+            "name": "Washington DC",
+            "nameWithAlternates": [
+                "District of Columbia",
+                "Washington DC"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "WV",
+            "name": "West Virginia",
+            "nameWithAlternates": [
+                "West Virginia"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "WI",
+            "name": "Wisconsin",
+            "nameWithAlternates": [
+                "Wisconsin"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "WY",
+            "name": "Wyoming",
+            "nameWithAlternates": [
+                "Wyoming"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "VI",
+            "name": "U.S. Virgin Islands",
+            "nameWithAlternates": [
+                "Virgin Islands",
+                "U.S. Virgin Islands"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "AA",
+            "name": "Armed Forces Americas",
+            "nameWithAlternates": [
+                "Armed Forces Americas"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "AE",
+            "name": "Armed Forces Europe",
+            "nameWithAlternates": [
+                "Armed Forces Europe"
+            ],
+            "__typename": "AddressZone"
+        },
+        {
+            "code": "AP",
+            "name": "Armed Forces Pacific",
+            "nameWithAlternates": [
+                "Armed Forces Pacific"
+            ],
+            "__typename": "AddressZone"
+        }
+    ]
+}

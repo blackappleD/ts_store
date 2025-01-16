@@ -1,0 +1,89 @@
+/* 通用按钮基础样式 */
+.action-button {
+  min-width: 100px;
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+}
+
+/* 主要按钮样式 */
+.primary-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.primary-button:hover {
+  background-color: #43a047;
+}
+
+.primary-button:active {
+  background-color: #388e3c;
+}
+
+.primary-button:disabled {
+  background-color: #c8e6c9;
+  cursor: not-allowed;
+}
+
+/* 删除按钮样式 */
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.delete-button:hover {
+  background-color: #e53935;
+}
+
+.delete-button:active {
+  background-color: #d32f2f;
+}
+
+/* 停止按钮样式 */
+.stop-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.stop-button:hover {
+  background-color: #e53935;
+}
+
+.stop-button:active {
+  background-color: #d32f2f;
+}
+
+/* 开始按钮样式 */
+.start-button {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.start-button:hover {
+  background-color: #43a047;
+}
+
+.start-button:active {
+  background-color: #388e3c;
+}
+
+.start-button:disabled {
+  background-color: #c8e6c9;
+  cursor: not-allowed;
+}
+
+/* 错误消息样式 */
+.error-message {
+  color: #f44336;
+  margin-top: 16px;
+  font-size: 14px;
+} 

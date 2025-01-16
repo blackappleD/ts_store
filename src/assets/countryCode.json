@@ -1,0 +1,20 @@
+{
+  "Zones": [
+    {
+      "code": "CN",
+      "name": "China"
+    },
+    {
+      "code": "US",
+      "name": "United States"
+    },
+    {
+      "code": "JP",
+      "name": "Japan"
+    },
+    {
+      "code": "KR",
+      "name": "South Korea"
+    }
+  ]
+} 

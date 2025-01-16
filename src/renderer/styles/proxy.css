@@ -1,0 +1,134 @@
+.proxy-manager {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+.proxy-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.proxy-list {
+  margin-bottom: 20px;
+}
+
+.proxy-item {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.proxy-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.protocol {
+  text-transform: uppercase;
+  font-weight: 500;
+  color: #666;
+}
+
+.host {
+  font-family: monospace;
+}
+
+.auth {
+  background: #e9ecef;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.proxy-status {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.status {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.status.healthy {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status.unhealthy {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.response-time {
+  font-family: monospace;
+  color: #666;
+}
+
+.add-proxy-form {
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
+
+.add-proxy-form h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  flex: 1;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  color: #666;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.add-button {
+  width: 100%;
+  padding: 10px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background: #218838;
+}
+
+.add-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+} 

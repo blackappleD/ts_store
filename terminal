@@ -1,0 +1,15 @@
+mkdir -p src/{main,renderer,common,utils}
+mkdir -p src/main/{services,controllers}
+mkdir -p src/renderer/{components,pages,styles}
+mkdir -p src/common/interfaces
+mkdir -p src/assets
+touch package.json
+touch tsconfig.json
+touch electron-builder.json 
+npm install --save-dev @types/node @types/electron @types/react @types/react-dom @types/puppeteer electron typescript
+npm install electron-store node-notifier
+npm install --save-dev @types/node-notifier 
+touch src/assets/icon.png src/assets/success.png src/assets/error.png 
+npm install --save-dev copy-webpack-plugin 
+rm -rf node_modules
+npm install 

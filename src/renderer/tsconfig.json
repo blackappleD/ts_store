@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "jsx": "react",
+    "noEmit": false,
+    "outDir": "../../dist/renderer"
+  },
+  "include": ["./**/*"]
+} 

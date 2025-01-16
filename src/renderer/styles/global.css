@@ -1,0 +1,118 @@
+:root {
+  --primary-color: #1a73e8;
+  --error-color: #d93025;
+  --success-color: #0f9d58;
+  --background-color: #f8f9fa;
+  --text-color: #202124;
+}
+
+body {
+  margin: 0;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+}
+
+.app-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.product-info {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: #e8f0fe;
+  border-radius: 4px;
+}
+
+.status {
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.main-content {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.left-panel,
+.right-panel {
+  flex: 1;
+}
+
+.account-manager,
+.purchase-strategy {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.account-list {
+  margin-bottom: 15px;
+}
+
+.account-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.add-account-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.add-account-form input {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.purchase-strategy select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 5px;
+} 
