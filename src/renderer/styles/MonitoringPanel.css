@@ -35,7 +35,9 @@
 }
 
 .form-group label {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin-bottom: 8px;
   color: #333;
   font-size: 14px;
@@ -71,11 +73,21 @@
 }
 
 .sub-option {
-  margin-top: 8px;
   margin-left: 24px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   gap: 12px;
+}
+
+.sub-option label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.sub-option input[type="number"] {
+  width: 80px;
+  padding: 4px 8px;
 }
 
 .action-buttons {
@@ -156,4 +168,88 @@
 
 .monitoring-panel::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+/* 添加错误提示样式 */
+.error-alert {
+  background-color: #fff2f0;
+  border: 1px solid #ffccc7;
+  border-radius: 4px;
+  padding: 16px;
+  margin: 16px 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.error-icon {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.error-message {
+  flex: 1;
+  color: #ff4d4f;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* 确保错误提示在移动设备上也能正常显示 */
+@media (max-width: 768px) {
+  .error-alert {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 12px;
+  }
+}
+
+/* 优化勾选框组样式 */
+.strategy-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.strategy-options label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.strategy-options input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* 基本设置中的勾选框样式 */
+.form-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* 子选项样式优化 */
+.sub-option {
+  margin-left: 24px;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sub-option label {
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.sub-option input[type="number"] {
+  width: 80px;
+  padding: 4px 8px;
 } 

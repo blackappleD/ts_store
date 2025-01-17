@@ -1,12 +1,12 @@
 {
   "Zones": [
     {
-      "code": "CN",
-      "name": "China"
-    },
-    {
       "code": "US",
       "name": "United States"
+    },
+    {
+      "code": "CN",
+      "name": "China"
     },
     {
       "code": "JP",

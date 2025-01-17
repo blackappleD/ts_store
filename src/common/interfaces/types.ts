@@ -49,18 +49,7 @@ export interface DeliveryInfo {
 
 export interface PaymentInfo {
   accountId: string;
-  delivery: {
-    country: string;
-    firstName: string;
-    lastName: string;
-    company?: string;
-    address1: string;
-    address2?: string;
-    city: string;
-    province: string;
-    postalCode: string;
-    phone: string;
-  };
+  delivery: DeliveryInfo;
   paymentMethod: 'credit-card' | 'alipay' | 'wechat-pay';
   creditCard?: {
     number: string;
@@ -150,4 +139,9 @@ export interface Zone {
 
 export interface CountryData {
   Zones: Zone[];
+}
+
+export interface PurchaseSettings {
+  singleAccountLimit: number;
+  quantityPerOrder: number;
 } 

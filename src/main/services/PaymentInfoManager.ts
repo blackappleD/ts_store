@@ -20,21 +20,18 @@ export class PaymentInfoManager {
   }
 
   public async getPaymentInfo(username: string): Promise<PaymentInfo | null> {
-    return this.store.get(`payment-info.${username}`) as PaymentInfo | null;
+    return this.store.get(username) as PaymentInfo | null;
   }
 
   public async savePaymentInfo(username: string, info: PaymentInfo): Promise<void> {
-    if (!info.accountId) {
-      info = {
-        ...info,
-        accountId: username
-      };
-    }
-    await this.store.set(`payment-info.${username}`, info);
+    info = {
+      ...info,
+      accountId: username
+    };
+    await this.store.set(username, info);
   }
 
   public async hasPaymentInfo(username: string): Promise<boolean> {
-    const info = await this.getPaymentInfo(username);
-    return !!info;
+    return this.store.has(username);
   }
 } 

@@ -1,20 +1,14 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const fs = require('fs');
-
-// 确保 assets 目录存在
-const assetsDir = path.resolve(__dirname, 'src/assets');
-if (!fs.existsSync(assetsDir)) {
-  fs.mkdirSync(assetsDir, { recursive: true });
-}
 
 const mainConfig = {
-  target: 'electron-main',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './src/main/main.ts',
+  target: 'electron-main',
   output: {
-    filename: 'main.js',
-    path: path.resolve(__dirname, 'dist/main')
+    path: path.join(__dirname, 'dist/main'),
+    filename: 'main.js'
   },
   module: {
     rules: [
@@ -26,7 +20,7 @@ const mainConfig = {
     ]
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: ['.ts', '.js', '.json']
   },
   node: {
     __dirname: false,
@@ -35,14 +29,12 @@ const mainConfig = {
 };
 
 const rendererConfig = {
-  target: 'electron-renderer',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './src/renderer/index.tsx',
+  target: 'electron-renderer',
   output: {
-    path: path.resolve(__dirname, 'dist/renderer'),
+    path: path.join(__dirname, 'dist/renderer'),
     filename: 'bundle.js'
-  },
-  resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.json']
   },
   module: {
     rules: [
@@ -61,20 +53,26 @@ const rendererConfig = {
       }
     ]
   },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.json']
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: './src/renderer/index.html'
     }),
     new CopyWebpackPlugin({
       patterns: [
-        { 
-          from: path.resolve(__dirname, 'src/assets'),
-          to: path.resolve(__dirname, 'dist/renderer/assets'),
+        {
+          from: 'src/assets',
+          to: 'assets',
           noErrorOnMissing: true
         }
       ]
     })
-  ]
+  ],
+  optimization: {
+    minimize: process.env.NODE_ENV === 'production'
+  }
 };
 
 module.exports = [mainConfig, rendererConfig]; 

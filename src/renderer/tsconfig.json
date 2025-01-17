@@ -2,10 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "module": "ESNext",
-    "moduleResolution": "node",
-    "jsx": "react",
-    "noEmit": false,
-    "outDir": "../../dist/renderer"
+    "outDir": "../../dist/renderer",
+    "sourceMap": true,
+    "noEmit": false
   },
-  "include": ["./**/*"]
+  "include": [
+    "**/*",
+    "../common/**/*"
+  ]
 } 

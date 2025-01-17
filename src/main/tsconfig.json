@@ -3,8 +3,11 @@
   "compilerOptions": {
     "module": "CommonJS",
     "outDir": "../../dist/main",
-    "rootDir": "..",
+    "sourceMap": true,
     "noEmit": false
   },
-  "include": ["./**/*", "../common/**/*"]
+  "include": [
+    "**/*",
+    "../common/**/*"
+  ]
 } 

@@ -1,20 +1,35 @@
 {
-  "appId": "com.taylorswift.cdbuyer",
-  "productName": "Taylor Swift CD Buyer",
+  "appId": "com.ct.taylor-swift-cd-monitor",
+  "productName": "Taylor Swift CD Monitor",
+  "copyright": "Copyright © 2024 Ct",
   "directories": {
-    "output": "build"
+    "output": "release",
+    "buildResources": "build"
   },
   "files": [
     "dist/**/*",
     "package.json"
   ],
   "win": {
-    "target": ["nsis"]
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      },
+      {
+        "target": "portable"
+      }
+    ],
+    "icon": "build/icon.ico",
+    "requestedExecutionLevel": "asInvoker"
   },
-  "mac": {
-    "target": ["dmg"]
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "Taylor Swift CD Monitor"
   },
-  "linux": {
-    "target": ["AppImage"]
-  }
+  "asar": true
 } 

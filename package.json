@@ -1,16 +1,24 @@
 {
-  "name": "taylor-swift-cd-buyer",
+  "name": "taylor-swift-cd-monitor",
   "version": "1.0.0",
   "description": "Taylor Swift CD Snapped Monitor",
-  "main": "./dist/main/main.js",
+  "author": {
+    "name": "Ct",
+    "email": "your-email@example.com"
+  },
+  "main": "dist/main/main.js",
   "scripts": {
     "start": "electron .",
     "dev": "npx rimraf dist && webpack --config webpack.config.js --mode development && concurrently \"npm run watch\" \"npm run electron-dev\"",
-    "build": "npx rimraf dist && webpack --config webpack.config.js --mode production && electron-builder",
+    "build": "npm run build:main && npm run build:renderer",
+    "build:main": "tsc -p src/main/tsconfig.json",
+    "build:renderer": "webpack --config webpack.config.js --mode production",
+    "package": "electron-builder build --win --config electron-builder.json",
+    "make": "rimraf dist release && npm run build && npm run package",
     "watch": "webpack --config webpack.config.js --mode development --watch",
     "electron-dev": "wait-on dist/renderer/index.html && electron .",
     "postinstall": "electron-builder install-app-deps",
-    "clean": "npx rimraf dist"
+    "clean": "npx rimraf dist release"
   },
   "dependencies": {
     "axios": "^1.6.7",
@@ -34,14 +42,43 @@
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^6.10.0",
     "electron": "^28.2.3",
-    "electron-builder": "^24.9.1",
+    "electron-builder": "^24.13.3",
     "html-webpack-plugin": "^5.6.0",
+    "rimraf": "^5.0.5",
     "style-loader": "^3.3.4",
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
     "wait-on": "^7.2.0",
     "webpack": "^5.90.3",
-    "webpack-cli": "^5.1.4",
-    "rimraf": "^5.0.5"
+    "webpack-cli": "^5.1.4"
+  },
+  "build": {
+    "appId": "com.ct.taylor-swift-cd-monitor",
+    "productName": "Taylor Swift CD Monitor",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Taylor Swift CD Monitor"
+    }
   }
-} 
+}

@@ -1,33 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ipcRenderer } from 'electron';
-import { UserCredentials, Zone, CountryData } from '../../common/interfaces/types';
+import { UserCredentials, Zone, CountryData, PaymentInfo, DeliveryInfo } from '../../common/interfaces/types';
 import countryData from '../../assets/countryCode.json';
-
-interface DeliveryInfo {
-  country: string;
-  firstName: string;
-  lastName: string;
-  company?: string;
-  address1: string;
-  address2?: string;
-  city: string;
-  province: string;
-  postalCode: string;
-  phone: string;
-}
-
-interface PaymentInfo {
-  accountId: string;
-  delivery: DeliveryInfo;
-  paymentMethod: 'credit-card' | 'alipay' | 'wechat-pay';
-  creditCard?: {
-    number: string;
-    holder: string;
-    expMonth: string;
-    expYear: string;
-    cvv: string;
-  };
-}
 
 const zones = (countryData as CountryData).Zones;
 
@@ -56,23 +30,12 @@ export const PaymentInfoManager: React.FC<PaymentInfoManagerProps> = ({ selected
     paymentMethod: 'credit-card'
   });
 
-  const loadPaymentInfo = async (username: string) => {
-    try {
-      const savedInfo = await ipcRenderer.invoke('get-payment-info', username);
-      if (savedInfo) {
-        setPaymentInfo(savedInfo);
-        setCurrentAccount(username);
-      } else {
-        setPaymentInfo(prev => ({
-          ...prev,
-          accountId: username
-        }));
-        setCurrentAccount(username);
-      }
-    } catch (error) {
-      console.error('加载支付信息失败:', error);
+  useEffect(() => {
+    if (selectedAccount) {
+      setCurrentAccount(selectedAccount);
+      loadPaymentInfo(selectedAccount);
     }
-  };
+  }, [selectedAccount]);
 
   useEffect(() => {
     const loadAccounts = async () => {
@@ -80,21 +43,50 @@ export const PaymentInfoManager: React.FC<PaymentInfoManagerProps> = ({ selected
         const savedAccounts = await ipcRenderer.invoke('get-accounts');
         setAccounts(savedAccounts);
         
-        if (selectedAccount) {
-          await loadPaymentInfo(selectedAccount);
+        if (!selectedAccount && savedAccounts.length > 0) {
+          setCurrentAccount(savedAccounts[0].username);
+          loadPaymentInfo(savedAccounts[0].username);
         }
       } catch (error) {
         console.error('加载账号失败:', error);
       }
     };
-    loadAccounts();
-  }, [selectedAccount]);
 
-  useEffect(() => {
-    if (currentAccount) {
-      loadPaymentInfo(currentAccount);
+    loadAccounts();
+  }, []);
+
+  const loadPaymentInfo = async (username: string) => {
+    try {
+      const info = await ipcRenderer.invoke('get-payment-info', username);
+      if (info) {
+        setPaymentInfo(info);
+      } else {
+        setPaymentInfo({
+          accountId: username,
+          delivery: {
+            country: 'CN',
+            firstName: '',
+            lastName: '',
+            company: '',
+            address1: '',
+            address2: '',
+            city: '',
+            province: '',
+            postalCode: '',
+            phone: ''
+          },
+          paymentMethod: 'credit-card'
+        });
+      }
+    } catch (error) {
+      console.error('加载支付信息失败:', error);
     }
-  }, [currentAccount]);
+  };
+
+  const handleAccountChange = (username: string) => {
+    setCurrentAccount(username);
+    loadPaymentInfo(username);
+  };
 
   const validateForm = (): boolean => {
     const newErrors: { [key: string]: string } = {};
@@ -159,13 +151,13 @@ export const PaymentInfoManager: React.FC<PaymentInfoManagerProps> = ({ selected
         ...paymentInfo,
         accountId: currentAccount
       };
-      await ipcRenderer.invoke('save-payment-info', infoToSave);
+      await ipcRenderer.invoke('save-payment-info', currentAccount, infoToSave);
       
       const updatedAccounts = accounts.map(acc => ({
         ...acc,
         hasPaymentInfo: acc.username === currentAccount ? true : acc.hasPaymentInfo
       }));
-      setAccounts(updatedAccounts);
+      await ipcRenderer.invoke('save-accounts', updatedAccounts);
       
       alert('保存成功');
       setErrors({});
@@ -179,22 +171,28 @@ export const PaymentInfoManager: React.FC<PaymentInfoManagerProps> = ({ selected
     <div className="payment-info">
       <h3>配送与支付信息</h3>
       
+      <div className="info-alert">
+        <div className="info-icon">ℹ️</div>
+        <div className="info-content">
+          <p>多账号抢购模式下，每个账号都需要配置独立的支付信息。</p>
+          <p>请为每个账号设置正确的配送地址和支付方式，以确保抢购成功时能够顺利完成支付。</p>
+        </div>
+      </div>
+      
       <div className="payment-form">
         <div className="form-group">
-          <label>选择账号 <span className="required">*</span></label>
-          <select
-            value={currentAccount}
-            onChange={(e) => setCurrentAccount(e.target.value)}
-            className={errors.account ? 'error' : ''}
+          <label>选择账号</label>
+          <select 
+            value={currentAccount} 
+            onChange={(e) => handleAccountChange(e.target.value)}
           >
-            <option value="">请选择账号</option>
             {accounts.map(account => (
               <option key={account.username} value={account.username}>
                 {account.username}
+                {!account.hasPaymentInfo && " (未配置支付信息)"}
               </option>
             ))}
           </select>
-          {errors.account && <div className="error-message">{errors.account}</div>}
         </div>
 
         <div className="delivery-info">

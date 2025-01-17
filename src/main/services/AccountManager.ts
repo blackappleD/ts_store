@@ -1,13 +1,25 @@
 import Store from 'electron-store';
-import { UserCredentials } from '../../common/interfaces/types';
+import { UserCredentials, PurchaseSettings } from '../../common/interfaces/types';
+
+interface StoreSchema {
+  accounts: UserCredentials[];
+  purchaseSettings: PurchaseSettings;
+}
 
 export class AccountManagerService {
   private static instance: AccountManagerService;
-  private store: Store;
+  private store: Store<StoreSchema>;
 
   private constructor() {
-    this.store = new Store({
-      name: 'accounts'
+    this.store = new Store<StoreSchema>({
+      name: 'accounts',
+      defaults: {
+        accounts: [],
+        purchaseSettings: {
+          singleAccountLimit: 1,
+          quantityPerOrder: 1
+        }
+      }
     });
   }
 
@@ -19,7 +31,7 @@ export class AccountManagerService {
   }
 
   public async getAccounts(): Promise<UserCredentials[]> {
-    return this.store.get('accounts', []) as UserCredentials[];
+    return this.store.get('accounts', []);
   }
 
   public async saveAccounts(accounts: UserCredentials[]): Promise<void> {
@@ -39,5 +51,23 @@ export class AccountManagerService {
     const accounts = await this.getAccounts();
     const account = accounts.find(acc => acc.username === username);
     return account?.hasPaymentInfo || false;
+  }
+
+  public async savePurchaseSettings(settings: PurchaseSettings): Promise<void> {
+    try {
+      await this.store.set('purchaseSettings', settings);
+    } catch (error) {
+      console.error('保存购买设置失败:', error);
+      throw error;
+    }
+  }
+
+  public async getPurchaseSettings(): Promise<PurchaseSettings> {
+    try {
+      return this.store.get('purchaseSettings');
+    } catch (error) {
+      console.error('读取购买设置失败:', error);
+      throw error;
+    }
   }
 } 

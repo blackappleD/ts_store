@@ -21,7 +21,8 @@ export class ProductMonitor extends EventEmitter {
     BUTTON_CHECK: 100,
     CLICK_DELAY: 1000,
     CART_NOTIFY: 2000,
-    RANDOM_DELAY: 200
+    RANDOM_DELAY: 200,
+    ELEMENT_WAIT: 5000
   };
 
   constructor(
@@ -40,13 +41,16 @@ export class ProductMonitor extends EventEmitter {
     if (this.config.purchaseStrategy.multiAccount) {
       const accounts = await this.accountManager.getAccounts();
       
-      // 检查所有账号的支付信息
-      const unconfiguredAccounts = accounts.filter(async (account) => 
-        !(await this.paymentInfoManager.hasPaymentInfo(account.username))
-      );
+      // 使用 Promise.all 等待所有账号的支付信息检查完成
+      const unconfiguredAccounts = await Promise.all(
+        accounts.map(async (account) => {
+          const hasPaymentInfo = await this.paymentInfoManager.hasPaymentInfo(account.username);
+          return hasPaymentInfo ? null : account.username;
+        })
+      ).then(results => results.filter(username => username !== null));
 
       if (unconfiguredAccounts.length > 0) {
-        const accountNames = unconfiguredAccounts.map(a => a.username).join('/');
+        const accountNames = unconfiguredAccounts.join('/');
         throw new Error(`多账号抢购需要为每个账号配置支付信息，${accountNames}账号未配置`);
       }
     }
@@ -138,37 +142,44 @@ export class ProductMonitor extends EventEmitter {
     return false;
   }
 
+  private async getProductInfo(): Promise<{ available: boolean; name: string; price: number }> {
+    if (!this.page) throw new Error('Page not initialized');
+
+    await delay(Math.random() * this.TIMEOUTS.RANDOM_DELAY);
+
+    const response = await this.page.goto(this.config.targetUrl, {
+      waitUntil: 'domcontentloaded',
+      timeout: this.TIMEOUTS.PAGE_LOAD
+    });
+
+    if (!response || (response.status() !== 200 && response.status() !== 304)) {
+      throw new Error(`页面加载失败: ${response?.status()}`);
+    }
+
+    // 检查商品信息
+    return await this.page.evaluate(() => {
+      const titleElement = document.querySelector('.product-title, .product-name, h1');
+      const priceElement = document.querySelector('.product-price, .price');
+      const soldOutLabel = document.querySelector('.sold-out-label, .sold-out');
+      const outOfStockLabel = document.querySelector('.out-of-stock');
+      const stockElement = document.querySelector('.stock-count, .inventory-quantity');
+      const stockCount = stockElement ? parseInt(stockElement.textContent || '0') : null;
+
+      return {
+        available: !soldOutLabel && !outOfStockLabel && (stockCount === null || stockCount > 0),
+        name: titleElement?.textContent?.trim() || '',
+        price: priceElement ? parseFloat(priceElement.textContent?.replace(/[^\d.]/g, '') || '0') : 0
+      };
+    });
+  }
+
   private async checkAvailability(): Promise<void> {
-    if (!this.page) return;
-
     try {
-      await delay(Math.random() * this.TIMEOUTS.RANDOM_DELAY);
+      if (!this.page) return;
 
-      const response = await this.page.goto(this.config.targetUrl, {
-        waitUntil: 'domcontentloaded',
-        timeout: this.TIMEOUTS.PAGE_LOAD
-      });
-
-      if (!response || (response.status() !== 200 && response.status() !== 304)) {
-        throw new Error(`页面加载失败: ${response?.status()}`);
-      }
-
-      // 检查商品信息
-      const productInfo = await this.page.evaluate(() => {
-        const titleElement = document.querySelector('.product-title, .product-name, h1');
-        const priceElement = document.querySelector('.product-price, .price');
-        const soldOutLabel = document.querySelector('.sold-out-label, .sold-out');
-        const outOfStockLabel = document.querySelector('.out-of-stock');
-        const stockElement = document.querySelector('.stock-count, .inventory-quantity');
-        const stockCount = stockElement ? parseInt(stockElement.textContent || '0') : null;
-
-        return {
-          available: !soldOutLabel && !outOfStockLabel && (stockCount === null || stockCount > 0),
-          name: titleElement?.textContent?.trim() || '',
-          price: priceElement ? parseFloat(priceElement.textContent?.replace(/[^\d.]/g, '') || '0') : 0
-        };
-      });
-
+      // 检查商品状态
+      const productInfo = await this.getProductInfo();
+      
       if (productInfo.available) {
         console.log('商品状态:', productInfo);
 
@@ -179,14 +190,11 @@ export class ProductMonitor extends EventEmitter {
           return;
         }
 
-        // 使用选定账号登录
-        if (!await this.loginWithAccount(account)) {
-          console.log('账号登录失败');
-          return;
-        }
-
-        // 添加指定数量商品到购物车
-        const quantity = this.config.purchaseStrategy.purchaseLimit?.quantityPerOrder ?? 1;
+        // 获取购买设置
+        const purchaseSettings = await AccountManagerService.getInstance().getPurchaseSettings();
+        
+        // 使用购买设置
+        const quantity = purchaseSettings.quantityPerOrder;
         if (!await this.addToCartWithQuantity(quantity)) {
           console.log('添加商品到购物车失败');
           return;
@@ -213,6 +221,7 @@ export class ProductMonitor extends EventEmitter {
           );
 
           if (this.config.purchaseStrategy.autoPurchase) {
+            // 获取选定账号的支付信息
             const paymentInfo = await this.paymentInfoManager.getPaymentInfo(account.username);
             if (!paymentInfo) {
               console.log('未找到支付信息');
@@ -227,6 +236,7 @@ export class ProductMonitor extends EventEmitter {
               available: true
             };
 
+            // 直接进入购买流程，不需要登录
             const purchaseFlow = new PurchaseFlow(this.notificationManager);
             await purchaseFlow.execute(currentProduct, account, paymentInfo);
           }
@@ -236,19 +246,13 @@ export class ProductMonitor extends EventEmitter {
           console.error('添加到购物车失败:', error);
         }
       }
-
-      this.retryCount = 0;
-
-    } catch (error: unknown) {
+    } catch (error) {
       console.error('检查商品状态失败:', error);
-      this.retryCount++;
-
       if (this.config.autoRetry && this.retryCount < this.config.maxRetries) {
-        const retryDelay = Math.min(this.config.refreshInterval, 1000);
-        console.log(`将在 ${retryDelay}ms 后重试，当前重试次数: ${this.retryCount}`);
+        this.retryCount++;
+        console.log(`重试第 ${this.retryCount} 次`);
       } else {
-        this.stopMonitoring();
-        throw error;
+        this.emit('error', error);
       }
     }
   }
@@ -272,40 +276,84 @@ export class ProductMonitor extends EventEmitter {
     }
   }
 
-  private async loginWithAccount(account: UserCredentials): Promise<boolean> {
-    try {
-      await this.page!.type('#customer_email', account.username);
-      await this.page!.type('#customer_password', account.password);
-      await this.page!.click('#customer_login');
-      
-      // 等待登录成功
-      await this.page!.waitForSelector('.account-summary', { timeout: 5000 });
-      return true;
-    } catch (error) {
-      console.error('登录失败:', error);
-      return false;
-    }
-  }
-
   private async addToCartWithQuantity(quantity: number): Promise<boolean> {
     try {
-      // 设置商品数量
-      await this.page!.evaluate((qty) => {
-        const quantityInput = document.querySelector('input[name="quantity"]') as HTMLInputElement;
-        if (quantityInput) quantityInput.value = qty.toString();
-      }, quantity);
+      if (!this.page) return false;
 
-      // 点击添加到购物车按钮
-      const clicked = await this.waitForButtonAndClick();
-      if (!clicked) return false;
-
-      // 等待购物车通知
-      await this.page!.waitForSelector('.cart-notification', { 
-        timeout: this.TIMEOUTS.CART_NOTIFY,
-        visible: true
+      // 等待Add按钮出现并可点击
+      const addButton = await this.page.waitForSelector('button[name="add"], .add-to-cart, .add_to_cart', {
+        visible: true,
+        timeout: this.TIMEOUTS.ELEMENT_WAIT
       });
 
-      return true;
+      if (!addButton) {
+        console.log('未找到添加购物车按钮');
+        return false;
+      }
+
+      // 如果有数量输入框，设置数量
+      const quantityInput = await this.page.$('input[name="quantity"], .quantity-input');
+      if (quantityInput) {
+        await quantityInput.click({ clickCount: 3 }); // 全选当前值
+        await quantityInput.type(quantity.toString());
+      }
+
+      console.log('找到可点击的Add按钮，等待1秒后点击...');
+      await delay(1000); // 等待1秒再点击
+
+      // 点击添加按钮
+      await addButton.click();
+
+      // 等待侧边购物车出现和checkout按钮
+      try {
+        // 等待侧边购物车面板
+        await this.page.waitForSelector('.cart-drawer, .cart-sidebar, [data-cart-drawer], .drawer--right[data-drawer]', {
+          visible: true,
+          timeout: 5000
+        });
+
+        console.log('侧边购物车已打开，等待Checkout按钮...');
+
+        // 等待Checkout按钮出现
+        await this.page.waitForSelector(
+          'a[href="/checkout"], button[name="checkout"], .checkout-button, .go-to-checkout, [data-checkout-button]', 
+          {
+            visible: true,
+            timeout: 5000
+          }
+        );
+
+        console.log('商品已成功添加到购物车，且找到了Checkout按钮');
+        return true;
+      } catch (error) {
+        // 如果没有找到侧边购物车或Checkout按钮，检查其他可能的成功指示
+        try {
+          await Promise.race([
+            // 检查购物车数量变化
+            this.page.waitForFunction(
+              () => {
+                const cartCount = document.querySelector('.cart-count, .cart-items-count');
+                return cartCount && parseInt(cartCount.textContent || '0') > 0;
+              },
+              { timeout: 3000 }
+            ),
+            // 检查是否直接跳转到购物车或结账页面
+            this.page.waitForFunction(
+              () => {
+                const url = window.location.href;
+                return url.includes('/cart') || url.includes('/checkout');
+              },
+              { timeout: 3000 }
+            )
+          ]);
+          
+          console.log('商品已添加到购物车（通过替代方式确认）');
+          return true;
+        } catch (innerError) {
+          console.error('等待购物车更新失败:', error);
+          return false;
+        }
+      }
     } catch (error) {
       console.error('添加商品到购物车失败:', error);
       return false;
