@@ -35,29 +35,32 @@ export interface UserCredentials {
 }
 
 export interface DeliveryInfo {
-  country: string;
   firstName: string;
   lastName: string;
   company?: string;
   address1: string;
   address2?: string;
   city: string;
-  province: string;
+  province?: string;
+  countryCode: string;
   postalCode: string;
   phone: string;
+}
+
+export interface CardInfo {
+  number: string;
+  expiry: string;
+  cvv: string;
+  holderName: string;
 }
 
 export interface PaymentInfo {
   accountId: string;
   delivery: DeliveryInfo;
   paymentMethod: 'credit-card' | 'alipay' | 'wechat-pay';
-  creditCard?: {
-    number: string;
-    holder: string;
-    expMonth: string;
-    expYear: string;
-    cvv: string;
-  };
+  card?: CardInfo;
+  useSameAddress: boolean;
+  billingAddress?: DeliveryInfo;
 }
 
 export interface PurchaseResult {

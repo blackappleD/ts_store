@@ -87,9 +87,7 @@
 }
 
 .error-message {
-  color: #dc3545;
-  font-size: 14px;
-  margin-top: 4px;
+  display: none;
 }
 
 /* 必填字段标记 */
@@ -109,13 +107,7 @@
 .form-group input.error,
 .form-group select.error {
   border-color: #dc3545;
-}
-
-/* 错误消息样式 */
-.error-message {
-  color: #dc3545;
-  font-size: 12px;
-  margin-top: 4px;
+  box-shadow: 0 0 0 1px #dc3545;
 }
 
 /* 禁用状态的保存按钮样式 */

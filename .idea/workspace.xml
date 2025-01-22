@@ -4,29 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6654b8ea-58e5-4bab-9b2a-5dc5874847ac" name="Changes" comment="">
+    <list default="true" id="6654b8ea-58e5-4bab-9b2a-5dc5874847ac" name="Changes" comment="int">
+      <change afterPath="$PROJECT_DIR$/Payment.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.MD" beforeDir="false" afterPath="$PROJECT_DIR$/README.MD" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/electron-builder.json" beforeDir="false" afterPath="$PROJECT_DIR$/electron-builder.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/assets/countryCode.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/assets/countryCode.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/common/interfaces/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/common/interfaces/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/ipc/handlers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/ipc/handlers.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/main.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/main.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/services/AccountManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/services/AccountManager.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/services/PaymentInfoManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/services/PaymentInfoManager.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/services/ProductMonitor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/services/ProductMonitor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/services/ProxyManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/services/ProxyManager.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/tsconfig.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/services/PurchaseFlow.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/services/PurchaseFlow.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/services/PurchaseTaskManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/services/PurchaseTaskManager.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/components/AccountManager.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/AccountManager.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/components/MonitoringPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/MonitoringPanel.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/components/PaymentInfoManager.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/components/PaymentInfoManager.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/styles/AccountManager.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/styles/AccountManager.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/styles/MonitoringPanel.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/styles/MonitoringPanel.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/renderer/styles/global.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/styles/global.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/renderer/styles/payment-info.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/styles/payment-info.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/renderer/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/renderer/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webpack.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/webpack.config.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +64,9 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "settings.editor.selected.configurable": "settings.nodejs",
     "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.1.7\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
     "vue.rearranger.settings.migration": "true"
@@ -193,12 +191,45 @@
       <workItem from="1736994459904" duration="238000" />
       <workItem from="1737019392346" duration="60000" />
       <workItem from="1737019474599" duration="51000" />
-      <workItem from="1737019530365" duration="3659000" />
+      <workItem from="1737019530365" duration="21831000" />
     </task>
+    <task id="LOCAL-00001" summary="int">
+      <option name="closed" value="true" />
+      <created>1737096530797</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1737096530797</updated>
+    </task>
+    <task id="LOCAL-00002" summary="int">
+      <option name="closed" value="true" />
+      <created>1737096556807</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1737096556807</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="int" />
+    <option name="LAST_COMMIT_MESSAGE" value="int" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/main/services/ProductMonitor.ts</url>
+          <line>173</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1,27 +1,300 @@
+/* 主容器 */
 .account-manager {
-  width: 100%;
-  height: 100%;
-  padding: 24px;
-  box-sizing: border-box;
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .account-manager h2 {
-  margin-bottom: 24px;
+  margin: 0 0 20px 0;
   color: #333;
   font-size: 24px;
 }
 
+/* 内容区域 */
+.account-manager-content {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* 设置区域 */
+.settings-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* 添加账号区域 */
+.add-account-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.add-account-section h3 {
+  margin: 0 0 16px;
+  color: #333;
+  font-size: 18px;
+}
+
+.add-account-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.add-account-form input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.add-account-form input:focus {
+  border-color: #40a9ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+  outline: none;
+}
+
+.add-account-form button {
+  background-color: #52c41a;
+  color: white;
+  padding: 8px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.add-account-form button:hover {
+  background-color: #73d13d;
+}
+
+.add-account-form button:active {
+  background-color: #389e0d;
+}
+
+/* 账号列表区域 */
+.account-list-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.account-list-section h3 {
+  margin: 0 0 16px;
+  color: #333;
+  font-size: 18px;
+}
+
+/* 表格容器 */
+.account-list {
+  width: 100%;
+  background: white;
+}
+
+/* 表格样式 */
+.account-list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* 表头样式 */
+.account-list th {
+  background-color: #fafafa;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 500;
+  color: #333;
+  border: 1px solid #e8e8e8;
+  border-width: 1px 0;
+  white-space: nowrap;
+}
+
+/* 单元格样式 */
+.account-list td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8e8e8;
+  color: #333;
+}
+
+/* 最后一行去除底部边框 */
+.account-list tr:last-child td {
+  border-bottom: none;
+}
+
+/* 鼠标悬停效果 */
+.account-list tbody tr:hover {
+  background-color: #fafafa;
+}
+
+/* 单选框容器 */
+.radio-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 单选框样式 */
+.account-list input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #1890ff;
+}
+
+/* 用户名列样式 */
+.username-cell {
+  font-weight: 500;
+  color: #1890ff;
+}
+
+/* 订单数量列样式 */
+.order-count-cell {
+  text-align: center;
+  color: #666;
+}
+
+/* 按钮组样式 */
+.button-group {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+}
+
+/* 操作按钮基础样式 */
+.operation-button {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+/* 编辑按钮 */
+.edit-button {
+  background-color: #1890ff;
+  color: white;
+}
+
+.edit-button:hover {
+  background-color: #40a9ff;
+}
+
+.edit-button:active {
+  background-color: #096dd9;
+}
+
+/* 删除按钮 */
+.delete-button {
+  background-color: #ff4d4f;
+  color: white;
+  width: 100px;
+}
+
+.delete-button:hover {
+  background-color: #ff7875;
+}
+
+.delete-button:active {
+  background-color: #d9363e;
+}
+
+/* 添加支付信息按钮 */
+.add-payment-button {
+  background-color: #52c41a;
+  color: white;
+  width: 100px;
+}
+
+.add-payment-button:hover {
+  background-color: #73d13d;
+}
+
+.add-payment-button:active {
+  background-color: #389e0d;
+}
+
+/* 空状态提示 */
+.empty-list {
+  padding: 32px;
+  text-align: center;
+  color: #999;
+  font-size: 14px;
+  background: white;
+  border-radius: 8px;
+}
+
+/* 表格响应式处理 */
+@media (max-width: 768px) {
+  .account-list {
+    overflow-x: auto;
+  }
+  
+  .account-list table {
+    min-width: 600px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .operation-button {
+    width: 100%;
+  }
+}
+
+/* 滚动条样式 */
+.account-manager-content::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.account-manager-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.account-manager-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.account-manager-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 其他样式保持不变 */
+
 /* 主卡片容器 */
 .account-manager-container {
+  flex: 1;
   background: #fff;
-  border: 1px solid #e8e8e8;
   border-radius: 8px;
-  padding: 24px;
-  width: 100%;
-  box-sizing: border-box;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
 }
 
 /* 购买设置卡片 */
@@ -34,21 +307,6 @@
 }
 
 .purchase-settings h3 {
-  margin: 0 0 16px 0;
-  color: #333;
-  font-size: 18px;
-}
-
-/* 添加账号卡片 */
-.add-account {
-  margin-bottom: 24px;
-  padding: 20px;
-  border: 1px solid #e8e8e8;
-  border-radius: 4px;
-  background: #fafafa;
-}
-
-.add-account h3 {
   margin: 0 0 16px 0;
   color: #333;
   font-size: 18px;
@@ -89,104 +347,70 @@
   font-size: 14px;
 }
 
-/* 添加账号表单 */
-.add-account input {
-  padding: 8px 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 4px;
-  font-size: 14px;
-  margin-right: 12px;
-}
-
-.add-account button {
+/* 通用按钮基础样式 */
+.btn {
   padding: 8px 16px;
-  background-color: #1890ff;
-  color: white;
   border: none;
   border-radius: 4px;
+  font-size: 14px;
   cursor: pointer;
-  transition: all 0.3s;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 80px;
 }
 
-.add-account button:hover {
-  background-color: #40a9ff;
-}
-
-/* 账号列表表格 */
-.account-list table {
+/* 保存设置按钮 */
+.save-button {
   width: 100%;
-  border-collapse: collapse;
+  background-color: #1890ff;
+  color: white;
+  padding: 10px 20px;
+  font-size: 15px;
   margin-top: 16px;
 }
 
-.account-list th,
-.account-list td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #e8e8e8;
-}
-
-.account-list th {
-  background-color: #fafafa;
-  font-weight: 500;
-}
-
-/* 按钮样式 */
-.edit-button,
-.add-button,
-.delete-button {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.edit-button {
-  background-color: #1890ff;
-  color: white;
-}
-
-.edit-button:hover {
+.save-button:hover {
   background-color: #40a9ff;
 }
 
-.add-button {
-  background-color: #52c41a;
-  color: white;
+.save-button:active {
+  background-color: #096dd9;
 }
 
-.add-button:hover {
-  background-color: #73d13d;
+/* 禁用状态 */
+button:disabled {
+  background-color: #d9d9d9 !important;
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
-.delete-button {
-  background-color: #ff4d4f;
-  color: white;
+/* 加载状态 */
+button.loading {
+  position: relative;
+  color: transparent !important;
 }
 
-.delete-button:hover {
-  background-color: #ff7875;
+button.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: button-loading-spinner 0.6s linear infinite;
 }
 
-/* 美化滚动条 */
-.account-manager::-webkit-scrollbar {
-  width: 8px;
-}
-
-.account-manager::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 4px;
-}
-
-.account-manager::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 4px;
-}
-
-.account-manager::-webkit-scrollbar-thumb:hover {
-  background: #555;
+@keyframes button-loading-spinner {
+  from {
+    transform: rotate(0turn);
+  }
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 /* 响应式设计 */
@@ -218,14 +442,6 @@
 }
 
 /* 购买设置部分样式 */
-.settings-section {
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 24px;
-}
-
 .settings-section h3 {
   margin: 0 0 16px;
   color: #333;
@@ -251,23 +467,4 @@
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   font-size: 14px;
-}
-
-.settings-section .save-button {
-  background-color: #1890ff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 16px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.settings-section .save-button:hover {
-  background-color: #40a9ff;
-}
-
-.settings-section .save-button:active {
-  background-color: #096dd9;
 } 

@@ -92,6 +92,20 @@ export function setupAllHandlers(mainWindow: BrowserWindow) {
     mainWindow?.close();
   });
 
+  ipcMain.on('reload-window', () => {
+    mainWindow?.reload();
+  });
+
+  ipcMain.on('show-about', () => {
+    dialog.showMessageBox(mainWindow!, {
+      type: 'info',
+      title: '关于',
+      message: 'Taylor Swift CD Snapped Monitor',
+      detail: '版本 1.0.0\n作者: Ct\n© 2024 All Rights Reserved',
+      buttons: ['确定']
+    });
+  });
+
   // 标签切换相关的处理器
   ipcMain.on('switch-tab', (_, tab: string, params?: any) => {
     if (tab === 'payment-info' && params?.username) {

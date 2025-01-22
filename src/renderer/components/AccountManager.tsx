@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { UserCredentials } from '../../common/interfaces/types';
 import { ipcRenderer } from 'electron';
+import { Toast } from './Toast';
 import '../styles/AccountManager.css';
 
-interface AccountManagerProps {
+export interface AccountManagerProps {
   onAccountsChange?: (accounts: UserCredentials[]) => void;
+  onAccountSelect: (username: string) => void;
 }
 
-export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange }) => {
+export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange, onAccountSelect }) => {
   const [accounts, setAccounts] = useState<UserCredentials[]>([]);
   const [newAccount, setNewAccount] = useState<UserCredentials>({
     username: '',
@@ -22,6 +24,15 @@ export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange
     quantityPerOrder: 1
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [toast, setToast] = useState<{
+    show: boolean;
+    message: string;
+    type: 'success' | 'error' | 'info';
+  }>({
+    show: false,
+    message: '',
+    type: 'info'
+  });
 
   useEffect(() => {
     loadAccounts();
@@ -130,16 +141,20 @@ export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange
     }));
   };
 
-  const handleSavePurchaseSettings = async () => {
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    setToast({ show: true, message, type });
+  };
+
+  const handleSaveSettings = async () => {
     try {
-      setIsLoading(true);
-      await ipcRenderer.invoke('save-purchase-settings', purchaseSettings);
-      alert('购买设置保存成功');
+      await ipcRenderer.invoke('save-purchase-settings', {
+        singleAccountLimit: Number(purchaseSettings.singleAccountLimit),
+        quantityPerOrder: Number(purchaseSettings.quantityPerOrder)
+      });
+      showToast('购买设置保存成功', 'success');
     } catch (error) {
       console.error('保存购买设置失败:', error);
-      alert('保存设置失败，请重试');
-    } finally {
-      setIsLoading(false);
+      showToast('保存购买设置失败', 'error');
     }
   };
 
@@ -155,7 +170,7 @@ export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange
     <div className="account-manager">
       <h2>账号管理</h2>
       
-      <div className="account-manager-container">
+      <div className="account-manager-content">
         <div className="settings-section">
           <h3>购买设置</h3>
           <div className="form-group">
@@ -180,31 +195,33 @@ export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange
           </div>
           <button 
             className="save-button"
-            onClick={handleSavePurchaseSettings}
+            onClick={handleSaveSettings}
             disabled={isLoading}
           >
             {isLoading ? '保存中...' : '保存设置'}
           </button>
         </div>
 
-        <div className="add-account">
+        <div className="add-account-section">
           <h3>添加账号</h3>
-          <input
-            type="text"
-            placeholder="用户名"
-            value={newAccount.username}
-            onChange={(e) => setNewAccount(prev => ({ ...prev, username: e.target.value }))}
-          />
-          <input
-            type="password"
-            placeholder="密码"
-            value={newAccount.password}
-            onChange={(e) => setNewAccount(prev => ({ ...prev, password: e.target.value }))}
-          />
-          <button onClick={handleAddAccount}>添加账号</button>
+          <div className="add-account-form">
+            <input
+              type="text"
+              placeholder="用户名"
+              value={newAccount.username}
+              onChange={(e) => setNewAccount(prev => ({ ...prev, username: e.target.value }))}
+            />
+            <input
+              type="password"
+              placeholder="密码"
+              value={newAccount.password}
+              onChange={(e) => setNewAccount(prev => ({ ...prev, password: e.target.value }))}
+            />
+            <button onClick={handleAddAccount}>添加账号</button>
+          </div>
         </div>
 
-        <div className="account-list">
+        <div className="account-list-section">
           <h3>账号列表</h3>
           <table>
             <thead>
@@ -229,25 +246,27 @@ export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange
                   </td>
                   <td>{account.orderCount || 0}</td>
                   <td>
-                    {account.hasPaymentInfo ? (
-                      <button 
-                        className="edit-button"
-                        onClick={() => handleEditPaymentInfo(account.username)}
-                      >
-                        编辑支付信息
-                      </button>
-                    ) : (
-                      <button 
-                        className="add-button"
-                        onClick={() => handleAddPaymentInfo(account.username)}
-                      >
-                        添加支付信息
-                      </button>
-                    )}
+                    <div className="button-group">
+                      {account.hasPaymentInfo ? (
+                        <button 
+                          className="operation-button edit-button"
+                          onClick={() => handleEditPaymentInfo(account.username)}
+                        >
+                          编辑支付信息
+                        </button>
+                      ) : (
+                        <button 
+                          className="operation-button add-payment-button"
+                          onClick={() => handleAddPaymentInfo(account.username)}
+                        >
+                          添加支付信息
+                        </button>
+                      )}
+                    </div>
                   </td>
                   <td>
                     <button 
-                      className="delete-button"
+                      className="operation-button delete-button"
                       onClick={() => handleDeleteAccount(account.username)}
                     >
                       删除
@@ -259,6 +278,14 @@ export const AccountManager: React.FC<AccountManagerProps> = ({ onAccountsChange
           </table>
         </div>
       </div>
+
+      {toast.show && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(prev => ({ ...prev, show: false }))}
+        />
+      )}
     </div>
   );
 }; 

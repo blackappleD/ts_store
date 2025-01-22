@@ -1,0 +1,178 @@
+.payment-info-manager {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.account-selector {
+  margin-bottom: 30px;
+}
+
+.account-selector select {
+  width: 300px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* 配送信息区域 */
+.delivery-info {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.delivery-info h3 {
+  margin: 0 0 20px 0;
+  font-size: 18px;
+  color: #333;
+}
+
+/* 两列布局 */
+.name-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* 三列布局 */
+.address-details {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+/* 可选字段样式 */
+.optional-label::after {
+  content: " (optional)";
+  color: #666;
+  font-size: 12px;
+  font-weight: normal;
+}
+
+/* 必填字段标记 */
+.required-label::after {
+  content: '*';
+  color: #f44336;
+  margin-left: 4px;
+}
+
+/* 错误提示 */
+.error-message {
+  color: #ff4d4f;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* 保存按钮 */
+.save-button {
+  background-color: #000;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.save-button:hover {
+  background-color: #333;
+}
+
+/* 搜索图标 */
+.address-search {
+  position: relative;
+}
+
+.address-search input {
+  padding-right: 30px;
+}
+
+.address-search::after {
+  content: "🔍";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  pointer-events: none;
+}
+
+.card-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.expiry-cvv-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group input[type="password"] {
+  letter-spacing: 4px;
+  font-family: monospace;
+}
+
+/* 添加输入框焦点样式 */
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+}
+
+/* 添加必填字段标记 */
+.required-label::after {
+  content: '*';
+  color: #f44336;
+  margin-left: 4px;
+}
+
+/* 添加输入验证样式 */
+.form-group input:invalid,
+.form-group select:invalid {
+  border-color: #f44336;
+}
+
+.form-group input:invalid:focus,
+.form-group select:invalid:focus {
+  box-shadow: 0 0 0 2px rgba(244, 67, 54, 0.2);
+} 

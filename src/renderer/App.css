@@ -1,0 +1,95 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #fff;
+}
+
+.title-bar {
+  -webkit-app-region: drag;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 32px;
+  background: #f0f0f0;
+  padding: 0 10px;
+  user-select: none;
+}
+
+.title {
+  font-size: 14px;
+  color: #333;
+}
+
+.window-controls {
+  -webkit-app-region: no-drag;
+  display: flex;
+  gap: 8px;
+}
+
+.window-controls button {
+  border: none;
+  background: none;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.window-controls button:hover {
+  background: #e0e0e0;
+}
+
+.window-controls button:last-child:hover {
+  background: #ff4d4f;
+  color: white;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  background: #f0f0f0;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab-group {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.tab, .action-button {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.tab:hover, .action-button:hover {
+  background: #e0e0e0;
+}
+
+.tab.active {
+  background: #4CAF50;
+  color: white;
+}
+
+.action-button {
+  color: #666;
+}
+
+.content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+} 
