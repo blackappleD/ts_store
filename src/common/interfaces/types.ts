@@ -1,3 +1,5 @@
+import { Page, BrowserContext } from 'puppeteer';
+
 export interface Config {
   targetUrl: string;
   refreshInterval: number;
@@ -5,6 +7,13 @@ export interface Config {
   maxRetries: number;
   notificationEnabled: boolean;
   purchaseStrategy: PurchaseStrategy;
+  maxConcurrentSessions: number;
+  retryDelay: number;
+  timeouts: {
+    elementWait: number;
+    navigation: number;
+    pageLoad: number;
+  };
 }
 
 export interface PurchaseStrategy {
@@ -57,7 +66,7 @@ export interface CardInfo {
 export interface PaymentInfo {
   accountId: string;
   delivery: DeliveryInfo;
-  paymentMethod: 'credit-card' | 'alipay' | 'wechat-pay';
+  paymentMethod: 'credit-card';
   card?: CardInfo;
   useSameAddress: boolean;
   billingAddress?: DeliveryInfo;
@@ -120,21 +129,6 @@ export interface CaptchaSolution {
   success: boolean;
 }
 
-export interface MonitorConfig {
-  targetUrl: string;
-  refreshInterval: number;
-  autoRetry: boolean;
-  maxRetries: number;
-  notificationEnabled: boolean;
-  purchaseStrategy: {
-    multiAccount: boolean;
-    priceLimit: boolean;
-    maxPrice: number;
-    priority: string;
-    autoPurchase: boolean;
-  };
-}
-
 export interface Zone {
   code: string;
   name: string;
@@ -147,4 +141,14 @@ export interface CountryData {
 export interface PurchaseSettings {
   singleAccountLimit: number;
   quantityPerOrder: number;
+}
+
+export interface AccountSession {
+  username: string;
+  credentials: UserCredentials;
+  paymentInfo: PaymentInfo;
+  page: Page;
+  context: BrowserContext;
+  isMonitoring: boolean;
+  retryCount: number;
 } 

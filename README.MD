@@ -217,6 +217,12 @@ graph TD
 5. 点击Pay Now按钮完成购买
 
 
-
-## issue
-1. 配送与支付信息切换账号时，配送信息没有对应切换 
+2025.1.23
+1. 设置页面添加浏览器设置板块
+   支持设置 
+   --incognito：启用/禁用无痕模式
+   --gpu: 启用/禁用GPU加速
+   --dev-shm-usage: 启用/禁用避免内存问题
+   --web-security:启用/ 禁用一些安全限制
+   --features=IsolateOrigins,site-per-process: 启用/禁用优化性能
+   --启用/禁用自动义User-Agent等

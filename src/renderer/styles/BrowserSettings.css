@@ -1,0 +1,28 @@
+.browser-settings {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.setting-item {
+  margin: 15px 0;
+}
+
+.setting-item label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.setting-item input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.setting-item input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+} 

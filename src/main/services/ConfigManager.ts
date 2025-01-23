@@ -4,12 +4,19 @@ import { Config, StoredConfig } from '../../common/interfaces/types';
 
 export class ConfigManager {
   private store: Store<StoredConfig>;
-  private defaultConfig: Config = {
+  private static readonly DEFAULT_CONFIG: Config = {
     targetUrl: '',
-    refreshInterval: 5000,
+    refreshInterval: 500,
     autoRetry: true,
     maxRetries: 3,
     notificationEnabled: true,
+    maxConcurrentSessions: 5,
+    retryDelay: 5000,
+    timeouts: {
+      elementWait: 2000,
+      navigation: 10000,
+      pageLoad: 5000
+    },
     purchaseStrategy: {
       autoPurchase: false,
       multiAccount: false,
@@ -25,7 +32,7 @@ export class ConfigManager {
   constructor() {
     this.store = new Store<StoredConfig>({
       defaults: {
-        ...this.defaultConfig,
+        ...ConfigManager.DEFAULT_CONFIG,
         credentials: '',
         paymentInfo: ''
       }
@@ -40,7 +47,20 @@ export class ConfigManager {
     });
 
     ipcMain.handle('save-config', async (_, config: Config) => {
-      return this.saveConfig(config);
+      return this.saveConfig(config, true);
+    });
+
+    ipcMain.handle('update-config', async (_, config: Config) => {
+      try {
+        await this.saveConfig(config, false);
+        return { success: true };
+      } catch (error: any) {
+        console.error('Failed to update config:', error);
+        return { 
+          success: false, 
+          error: error?.message || 'Unknown error occurred'
+        };
+      }
     });
 
     ipcMain.handle('reset-config', () => {
@@ -56,6 +76,13 @@ export class ConfigManager {
         autoRetry: this.store.get('autoRetry', true),
         maxRetries: this.store.get('maxRetries', 3),
         notificationEnabled: this.store.get('notificationEnabled', true),
+        maxConcurrentSessions: this.store.get('maxConcurrentSessions', 5),
+        retryDelay: this.store.get('retryDelay', 5000),
+        timeouts: this.store.get('timeouts', {
+          elementWait: 5000,
+          navigation: 30000,
+          pageLoad: 30000
+        }),
         purchaseStrategy: this.store.get('purchaseStrategy', {
           autoPurchase: false,
           multiAccount: false,
@@ -65,17 +92,26 @@ export class ConfigManager {
             singleAccountLimit: 1,
             quantityPerOrder: 1
           }
+        }),
+        browserConfig: this.store.get('browserConfig', {
+          incognito: true,
+          disableGPU: false,
+          disableDevShmUsage: false,
+          disableWebSecurity: false,
+          disableFeatures: false,
+          enableCustomUserAgent: false,
+          userAgent: ''
         })
       };
       console.log('Retrieved config from store:', config);
       return config;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error getting config:', error);
-      return this.defaultConfig;
+      return ConfigManager.DEFAULT_CONFIG;
     }
   }
 
-  public async saveConfig(config: Config): Promise<void> {
+  public async saveConfig(config: Config, validateAll: boolean = true): Promise<void> {
     console.log('Attempting to save config:', config);
     
     if (!config) {
@@ -83,48 +119,48 @@ export class ConfigManager {
       throw new Error('Config is undefined');
     }
 
-    // 验证 URL
-    if (!config.targetUrl) {
-      console.error('Target URL is empty');
-      throw new Error('Target URL is required');
-    }
-
     try {
-      const url = new URL(config.targetUrl);
-      console.log('Valid URL:', url.href);
-    } catch (e) {
-      console.error('Invalid URL format:', config.targetUrl);
-      throw new Error('Invalid URL format');
-    }
+      // 只在需要完整验证时检查URL
+      if (validateAll) {
+        // 验证 URL
+        if (!config.targetUrl) {
+          console.error('Target URL is empty');
+          throw new Error('Target URL is required');
+        }
 
-    try {
-      // 保存每个配置项
-      await this.store.set('targetUrl', config.targetUrl);
-      await this.store.set('refreshInterval', config.refreshInterval);
-      await this.store.set('autoRetry', config.autoRetry);
-      await this.store.set('maxRetries', config.maxRetries);
-      await this.store.set('notificationEnabled', config.notificationEnabled);
-      await this.store.set('purchaseStrategy', config.purchaseStrategy);
-
-      // 验证保存是否成功
-      const savedUrl = this.store.get('targetUrl');
-      console.log('Saved URL:', savedUrl);
-      
-      if (savedUrl !== config.targetUrl) {
-        throw new Error('Failed to save URL');
+        try {
+          const url = new URL(config.targetUrl);
+          console.log('Valid URL:', url.href);
+        } catch (e) {
+          console.error('Invalid URL format:', config.targetUrl);
+          throw new Error('Invalid URL format');
+        }
       }
-    } catch (error) {
+
+      // 保存每个配置项
+      if (validateAll) {
+        await this.store.set('targetUrl', config.targetUrl);
+        await this.store.set('refreshInterval', config.refreshInterval);
+        await this.store.set('autoRetry', config.autoRetry);
+        await this.store.set('maxRetries', config.maxRetries);
+        await this.store.set('notificationEnabled', config.notificationEnabled);
+        await this.store.set('maxConcurrentSessions', config.maxConcurrentSessions);
+        await this.store.set('retryDelay', config.retryDelay);
+        await this.store.set('timeouts', config.timeouts);
+        await this.store.set('purchaseStrategy', config.purchaseStrategy);
+      }
+      
+
+      console.log('Config saved successfully');
+    } catch (error: any) {
       console.error('Failed to save config:', error);
-      throw error;
+      throw new Error(error?.message || 'Failed to save configuration');
     }
   }
 
   public resetConfig(): void {
-    // 先清除所有配置
     this.store.clear();
-    
-    // 然后设置默认配置
-    Object.entries(this.defaultConfig).forEach(([key, value]) => {
+    Object.entries(ConfigManager.DEFAULT_CONFIG).forEach(([key, value]) => {
       this.store.set(key, value);
     });
   }
@@ -143,5 +179,18 @@ export class ConfigManager {
 
   public savePaymentInfo(paymentInfo: string): void {
     this.store.set('paymentInfo', paymentInfo || '');
+  }
+
+  public loadConfig(): Config {
+    try {
+      const storedConfig = this.store.get('config') as Config;
+      return {
+        ...ConfigManager.DEFAULT_CONFIG,
+        ...storedConfig
+      };
+    } catch (error: any) {
+      console.error('加载配置失败:', error);
+      return ConfigManager.DEFAULT_CONFIG;
+    }
   }
 } 

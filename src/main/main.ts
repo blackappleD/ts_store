@@ -1,8 +1,10 @@
 import { app, BrowserWindow } from 'electron';
 import path from 'path';
 import { setupAllHandlers } from './ipc/handlers';
+import { ConfigManager } from './services/ConfigManager';
 
 let mainWindow: BrowserWindow | null = null;
+let configManager: ConfigManager;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -14,6 +16,9 @@ function createWindow() {
       contextIsolation: false
     }
   });
+
+  // 初始化配置管理器
+  configManager = new ConfigManager();
 
   mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
   setupAllHandlers(mainWindow);

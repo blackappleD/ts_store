@@ -1,6 +1,6 @@
 import {EventEmitter} from 'events';
-import puppeteer, {Browser, Page} from 'puppeteer';
-import {Config, Product, UserCredentials} from '../../common/interfaces/types';
+import puppeteer, {Browser, Page, BrowserContext} from 'puppeteer';
+import {Config, Product, UserCredentials, AccountSession, PaymentInfo} from '../../common/interfaces/types';
 import {INotificationManager} from './NotificationManager';
 import {AccountManagerService} from './AccountManager';
 import {PaymentInfoManager} from './PaymentInfoManager';
@@ -9,378 +9,256 @@ import {delay} from '../../utils/helpers';
 
 export class ProductMonitor extends EventEmitter {
     private browser: Browser | null = null;
-    private page: Page | null = null;
+    private sessions: Map<string, AccountSession> = new Map();
     private isMonitoring: boolean = false;
-    private monitoringInterval: NodeJS.Timeout | null = null;
-    private retryCount: number = 0;
-    private accountManager: AccountManagerService;
-    private paymentInfoManager: PaymentInfoManager;
-
-    private readonly TIMEOUTS = {
-        PAGE_LOAD: 10000,
-        BUTTON_CHECK: 100,
-        CLICK_DELAY: 1000,
-        CART_NOTIFY: 2000,
-        RANDOM_DELAY: 200,
-        ELEMENT_WAIT: 5000
-    };
+    private readonly config: Config;
 
     constructor(
-        private config: Config,
-        private notificationManager: INotificationManager
+        config: Config,
+        private readonly notificationManager: INotificationManager,
+        private readonly accountManager: AccountManagerService,
+        private readonly paymentInfoManager: PaymentInfoManager
     ) {
         super();
-        this.accountManager = AccountManagerService.getInstance();
-        this.paymentInfoManager = PaymentInfoManager.getInstance();
+        this.config = {
+            targetUrl: config.targetUrl || '',
+            refreshInterval: config.refreshInterval || 1000,
+            autoRetry: config.autoRetry ?? true,
+            maxRetries: config.maxRetries || 3,
+            notificationEnabled: config.notificationEnabled ?? true,
+            maxConcurrentSessions: config.maxConcurrentSessions || 5,
+            retryDelay: config.retryDelay || 5000,
+            timeouts: {
+                elementWait: config.timeouts?.elementWait || 5000,
+                navigation: config.timeouts?.navigation || 30000,
+                pageLoad: config.timeouts?.pageLoad || 30000
+            },
+            purchaseStrategy: {
+                autoPurchase: config.purchaseStrategy?.autoPurchase ?? false,
+                multiAccount: config.purchaseStrategy?.multiAccount ?? false,
+                priceLimit: config.purchaseStrategy?.priceLimit ?? false,
+                maxPrice: config.purchaseStrategy?.maxPrice || 0,
+                purchaseLimit: {
+                    singleAccountLimit: config.purchaseStrategy?.purchaseLimit?.singleAccountLimit || 1,
+                    quantityPerOrder: config.purchaseStrategy?.purchaseLimit?.quantityPerOrder || 1
+                }
+            }
+        };
+    }
+
+    private async createSession(account: UserCredentials, index: number): Promise<void> {
+        const paymentInfo = await this.paymentInfoManager.getPaymentInfo(account.username);
+        if (!paymentInfo) return;
+
+        // 创建独立的浏览器上下文
+        const context = await this.browser!.createBrowserContext();
+        const page = await context.newPage();
+        
+        // 设置页面位置，每个窗口错开显示
+        const offset = index * 50;  // 每个窗口错开50像素
+        await page.evaluate((x, y) => {
+            window.moveTo(x, y);
+        }, 50 + offset, 50 + offset);
+
+        // 设置页面超时
+        await page.setDefaultNavigationTimeout(this.config.timeouts.navigation);
+
+        // 创建会话
+        this.sessions.set(account.username, {
+            username: account.username,
+            credentials: account,
+            paymentInfo,
+            page,
+            context,
+            isMonitoring: false,
+            retryCount: 0
+        });
+
+        // 启动监控
+        void this.startSessionMonitoring(account.username);
     }
 
     public async startMonitoring(): Promise<void> {
         if (this.isMonitoring) return;
-
-        // 检查多账号配置
-        if (this.config.purchaseStrategy.multiAccount) {
-            const accounts = await this.accountManager.getAccounts();
-
-            // 使用 Promise.all 等待所有账号的支付信息检查完成
-            const unconfiguredAccounts = await Promise.all(
-                accounts.map(async (account) => {
-                    const hasPaymentInfo = await this.paymentInfoManager.hasPaymentInfo(account.username);
-                    return hasPaymentInfo ? null : account.username;
-                })
-            ).then(results => results.filter(username => username !== null));
-
-            if (unconfiguredAccounts.length > 0) {
-                const accountNames = unconfiguredAccounts.join('/');
-                throw new Error(`多账号抢购需要为每个账号配置支付信息，${accountNames}账号未配置`);
-            }
-        }
-
+        
         try {
             this.browser = await puppeteer.launch({
                 headless: false,
-                defaultViewport: null,
-                args: ['--no-sandbox', '--disable-setuid-sandbox']
+                defaultViewport: {
+                    width: 1280,
+                    height: 800
+                },
+                args: [
+                    `--window-size=1280,800`
+                ]
             });
 
-            this.page = await this.browser.newPage();
-
-            // 设置页面缓存禁用
-            await this.page.setCacheEnabled(false);
-
-            // 设置请求拦截
-            await this.page.setRequestInterception(true);
-            this.page.on('request', request => {
-                const headers = {
-                    ...request.headers(),
-                    'Cache-Control': 'no-cache',
-                    'Pragma': 'no-cache'
-                };
-                request.continue({headers});
-            });
+            // 获取所有账号
+            const accounts = await this.accountManager.getAccounts();
+            
+            // 为每个账号创建会话，传入索引用于计算窗口位置
+            for (let i = 0; i < accounts.length; i++) {
+                await this.createSession(accounts[i], i);
+            }
 
             this.isMonitoring = true;
-            this.retryCount = 0;
-
-            await this.checkAvailability();
-            this.monitoringInterval = setInterval(
-                () => this.checkAvailability(),
-                this.config.refreshInterval
-            );
-
         } catch (error) {
             console.error('启动监控失败:', error);
+            await this.cleanup();
             throw error;
         }
     }
 
-    private async waitForButtonAndClick(): Promise<boolean> {
-        let checkCount = 0;
-        const maxChecks = 50; // 最多检查5秒 (100ms * 50)
+    private async startSessionMonitoring(username: string): Promise<void> {
+        const session = this.sessions.get(username);
+        if (!session) return;
 
-        while (checkCount < maxChecks) {
-            const buttonInfo = await this.page!.evaluate(() => {
-                const addToCartButton = document.querySelector('button[name="add"]') as HTMLButtonElement | null;
-                if (!addToCartButton) return {exists: false};
+        session.isMonitoring = true;
+        console.log(`开始账号 ${username} 的监控`);
 
-                const isClickable = !addToCartButton.disabled &&
-                    !addToCartButton.classList.contains('disabled') &&
-                    getComputedStyle(addToCartButton).display !== 'none' &&
-                    getComputedStyle(addToCartButton).visibility !== 'hidden';
+        const monitorLoop = async (): Promise<void> => {
+            if (!session.isMonitoring) return;
 
-                return {
-                    exists: true,
-                    isClickable,
-                    text: addToCartButton.textContent?.trim() || ''
-                };
-            });
-
-            if (buttonInfo.exists && buttonInfo.isClickable) {
-                console.log('找到可点击的Add按钮，等待1秒后点击...');
-                await delay(this.TIMEOUTS.CLICK_DELAY);
-
-                // 再次确认按钮状态，避免1秒等待期间按钮状态改变
-                const finalCheck = await this.page!.evaluate(() => {
-                    const button = document.querySelector('button[name="add"]') as HTMLButtonElement | null;
-                    if (button &&
-                        !button.disabled &&
-                        !button.classList.contains('disabled') &&
-                        getComputedStyle(button).display !== 'none' &&
-                        getComputedStyle(button).visibility !== 'hidden') {
-                        button.click();
-                        return true;
-                    }
-                    return false;
+            try {
+                await session.page.goto(this.config.targetUrl, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: this.config.timeouts.navigation
                 });
 
-                return finalCheck;
-            }
+                const isAvailable = await this.checkProductAvailable(session.page);
+                
+                if (isAvailable) {
+                    console.log(`账号 ${username} 检测到商品可购买`);
+                    session.isMonitoring = false;
 
-            await delay(this.TIMEOUTS.BUTTON_CHECK);
-            checkCount++;
-        }
+                    try {
+                        const product = await this.getProductInfo(session.page);
+                        
+                        // 发出商品可用事件
+                        this.emit('product-available', product);
 
-        return false;
-    }
-
-    private async getProductInfo(): Promise<{ available: boolean; name: string; price: number }> {
-        if (!this.page) throw new Error('Page not initialized');
-
-        await delay(Math.random() * this.TIMEOUTS.RANDOM_DELAY);
-
-        const response = await this.page.goto(this.config.targetUrl, {
-            waitUntil: 'domcontentloaded',
-            timeout: this.TIMEOUTS.PAGE_LOAD
-        });
-
-        if (!response || (response.status() !== 200 && response.status() !== 304)) {
-            throw new Error(`页面加载失败: ${response?.status()}`);
-        }
-
-        // 检查商品信息
-        return await this.page.evaluate(() => {
-            const titleElement = document.querySelector('.product-title, .product-name, h1');
-            const priceElement = document.querySelector('.product-price, .price');
-            const soldOutLabel = document.querySelector('.sold-out-label, .sold-out');
-            const outOfStockLabel = document.querySelector('.out-of-stock');
-            const stockElement = document.querySelector('.stock-count, .inventory-quantity');
-            const stockCount = stockElement ? parseInt(stockElement.textContent || '0') : null;
-
-            return {
-                available: !soldOutLabel && !outOfStockLabel && (stockCount === null || stockCount > 0),
-                name: titleElement?.textContent?.trim() || '',
-                price: priceElement ? parseFloat(priceElement.textContent?.replace(/[^\d.]/g, '') || '0') : 0
-            };
-        });
-    }
-
-    private async checkAvailability(): Promise<void> {
-        try {
-            if (!this.page) return;
-
-            // 检查商品状态
-            const productInfo = await this.getProductInfo();
-
-            if (productInfo.available) {
-                console.log('商品状态:', productInfo);
-
-                // 获取可用账号
-                const account = await this.getAvailableAccount();
-                if (!account) {
-                    console.log('没有可用账号');
-                    return;
-                }
-
-                // 获取购买设置
-                const purchaseSettings = await AccountManagerService.getInstance().getPurchaseSettings();
-
-                // 使用购买设置
-                const quantity = purchaseSettings.quantityPerOrder;
-                if (!await this.addToCartWithQuantity(quantity)) {
-                    console.log('添加商品到购物车失败');
-                    return;
-                }
-                // 等待购物车通知
-                try {
-                    if (this.config.purchaseStrategy.priceLimit &&
-                        productInfo.price > (this.config.purchaseStrategy.maxPrice ?? 0)) {
-                        console.log('商品价格超出限制:', productInfo.price);
-                        return;
-                    }
-
-                    await this.notificationManager.notify(
-                        '商品已添加到购物车',
-                        `${productInfo.name}\n价格: $${productInfo.price}\n开始自动购买流程`,
-                        'success'
-                    );
-
-                    if (this.config.purchaseStrategy.autoPurchase) {
-                        // 获取选定账号的支付信息
-                        const paymentInfo = await this.paymentInfoManager.getPaymentInfo(account.username);
-                        if (!paymentInfo) {
-                            console.log('未找到支付信息');
-                            return;
-                        }
-
-                        const currentProduct: Product = {
-                            id: Date.now().toString(),
-                            name: productInfo.name,
-                            price: productInfo.price,
-                            url: this.config.targetUrl,
-                            available: true
-                        };
-
-                        // 直接进入购买流程，不需要登录
+                        // 创建购买流程
                         const purchaseFlow = new PurchaseFlow(this.notificationManager);
-                        purchaseFlow.setPage(this.page);
-                        await purchaseFlow.execute(currentProduct, account, paymentInfo);
+                        purchaseFlow.setPage(session.page);
+
+                        // 获取购买设置
+                        const purchaseSettings = await AccountManagerService.getInstance().getPurchaseSettings();
+                        // 使用购买设置
+                        const quantity = purchaseSettings.quantityPerOrder;
+
+                        // 执行购买
+                        const success = await purchaseFlow.execute(
+                            product,
+                            session.credentials,
+                            session.paymentInfo,
+                            this.config.purchaseStrategy.autoPurchase,
+                            quantity
+                        );
+
+                        if (success) {
+                            await this.notificationManager.notify(
+                                '购买成功',
+                                `账号 ${username} 成功购买商品`,
+                                'success'
+                            );
+                        }
+                    } catch (error) {
+                        console.error(`账号 ${username} 购买失败:`, error);
+                        session.retryCount++;
+                        
+                        if (session.retryCount < this.config.maxRetries) {
+                            session.isMonitoring = true;
+                            setTimeout(() => void monitorLoop(), this.config.retryDelay);
+                        }
                     }
-
-                    this.stopMonitoring();
-                } catch (error) {
-                    console.error('添加到购物车失败:', error);
+                } else {
+                    const randomDelay = this.config.refreshInterval + Math.random() * 500;
+                    setTimeout(() => void monitorLoop(), randomDelay);
                 }
-            }
-        } catch (error) {
-            console.error('检查商品状态失败:', error);
-            if (this.config.autoRetry && this.retryCount < this.config.maxRetries) {
-                this.retryCount++;
-                console.log(`重试第 ${this.retryCount} 次`);
-            } else {
-                this.emit('error', error);
-            }
-        }
-    }
-
-    private async getAvailableAccount(): Promise<UserCredentials | null> {
-        const accounts = await this.accountManager.getAccounts();
-
-        if (this.config.purchaseStrategy.multiAccount) {
-            // 过滤出未达到下单限制的账号
-            const availableAccounts = accounts.filter(account =>
-                (account.orderCount || 0) < (this.config.purchaseStrategy.purchaseLimit?.singleAccountLimit || 1)
-            );
-
-            if (availableAccounts.length === 0) return null;
-
-            // 随机选择一个账号
-            return availableAccounts[Math.floor(Math.random() * availableAccounts.length)];
-        } else {
-            // 使用默认账号
-            return accounts.find(account => account.isDefault) || null;
-        }
-    }
-
-    private async addToCartWithQuantity(quantity: number): Promise<boolean> {
-        try {
-            if (!this.page) return false;
-
-            // 等待Add按钮出现并可点击
-            const addButton = await this.page.waitForSelector('button[name="add"], .add-to-cart, .add_to_cart', {
-                visible: true,
-                timeout: this.TIMEOUTS.ELEMENT_WAIT
-            });
-
-            if (!addButton) {
-                console.log('未找到添加购物车按钮');
-                return false;
-            }
-
-            // 通过点击+按钮增加商品数量
-            const plusButton = await this.page.$('.quantity__button-plus, .quantity-plus, .plus-btn, [data-quantity="plus"]');
-            if (plusButton) {
-                // 需要点击 quantity-1 次来达到目标数量
-                for (let i = 1; i < quantity; i++) {
-                    await plusButton.click();
-                    console.log('点击+按钮', i);
-                    await delay(200); // 添加短暂延迟确保点击生效
-                }
-            } else {
-                console.log('未找到数量增加按钮，将使用默认数量1');
-            }
-
-            console.log('找到可点击的Add按钮，等待1秒后点击...');
-            await delay(1000); // 等待1秒再点击
-
-            // 点击添加按钮
-            await addButton.click();
-
-            // 等待侧边购物车出现
-            await this.page.waitForSelector('.cart-drawer, .cart-sidebar, [data-cart-drawer], .drawer--right[data-drawer]', {
-                visible: true,
-                timeout: 5000
-            });
-
-            console.log('侧边购物车已打开，等待Checkout按钮...');
-
-            // 等待Checkout按钮出现
-            const checkoutButton = await this.page.waitForSelector(
-                'a[href="/checkout"], button[name="checkout"], .checkout-button, .go-to-checkout, [data-checkout-button]', 
-                {
-                    visible: true,
-                    timeout: 5000
-                }
-            );
-
-            if (!checkoutButton) {
-                console.log('未找到Checkout按钮');
-                return false;
-            }
-
-            console.log('找到Checkout按钮，准备点击...');
-            await delay(500); // 短暂延迟确保按钮可点击
-            await checkoutButton.click();
-
-            // 等待页面跳转到结账页面
-            try {
-                await Promise.race([
-                    // 等待导航完成
-                    this.page.waitForNavigation({
-                        waitUntil: 'networkidle0',
-                        timeout: 10000
-                    }),
-                    // 等待特定URL出现
-                    this.page.waitForFunction(
-                        () => window.location.href.includes('/checkouts/cn/'),
-                        { timeout: 10000 }
-                    )
-                ]);
             } catch (error) {
-                // 如果已经在结账页面,忽略导航超时错误
-                if (!this.page.url().includes('/checkouts/cn/')) {
-                    throw error;
+                console.error(`账号 ${username} 监控失败:`, error);
+                session.retryCount++;
+                
+                if (session.retryCount < this.config.maxRetries) {
+                    setTimeout(() => void monitorLoop(), this.config.retryDelay);
                 }
             }
+        };
 
-            console.log('成功跳转到结账页面');
-            return true;
-
-        } catch (error) {
-            console.error('添加商品到购物车或进入结账页面失败:', error);
-            return false;
-        }
+        void monitorLoop();
     }
 
-    public stopMonitoring(): void {
+    public async stopMonitoring(): Promise<void> {
         this.isMonitoring = false;
-        if (this.monitoringInterval) {
-            clearInterval(this.monitoringInterval);
-            this.monitoringInterval = null;
+        await this.cleanup();
+    }
+
+    private async cleanup(): Promise<void> {
+        // 停止所有会话
+        for (const session of this.sessions.values()) {
+            session.isMonitoring = false;
+            await session.page.close().catch(() => {});
+            await session.context.close().catch(() => {});
         }
+
+        // 关闭浏览器
         if (this.browser) {
-            this.browser.close();
+            await this.browser.close().catch(() => {});
             this.browser = null;
         }
-        this.page = null;
-        this.retryCount = 0;
+
+        this.sessions.clear();
     }
 
-    private async checkPaymentInfo(username: string): Promise<boolean> {
+    private async checkProductAvailable(page: Page): Promise<boolean> {
         try {
-            const info = await this.paymentInfoManager.getPaymentInfo(username);
-            return !!info;
+            await page.waitForSelector('button[name="add"], .add-to-cart, .add_to_cart', {
+                timeout: this.config.timeouts.elementWait
+            });
+
+            const isAvailable = await page.evaluate(() => {
+                const addButton = document.querySelector('button[name="add"], .add-to-cart, .add_to_cart') as HTMLButtonElement;
+                const soldOutLabel = document.querySelector('.sold-out-label, .sold-out');
+                const outOfStockLabel = document.querySelector('.out-of-stock');
+                const stockElement = document.querySelector('.stock-count, .inventory-quantity');
+                const stockCount = stockElement ? parseInt(stockElement.textContent || '0') : null;
+
+                return addButton && 
+                    !addButton.disabled && 
+                    !addButton.classList.contains('disabled') &&
+                    !soldOutLabel && 
+                    !outOfStockLabel && 
+                    (stockCount === null || stockCount > 0);
+            });
+
+            if (isAvailable) {
+                console.log('商品可购买');
+            }
+
+            return isAvailable;
         } catch (error) {
-            console.error('检查支付信息失败:', error);
+            console.error('检查商品可用性失败:', error);
             return false;
         }
+    }
+
+    private async getProductInfo(page: Page): Promise<Product> {
+        const productInfo = await page.evaluate(() => {
+            const titleElement = document.querySelector('.product-title, .product-name, h1');
+            const priceElement = document.querySelector('.product-price, .price');
+            const addButton = document.querySelector('button[name="add"], .add-to-cart, .add_to_cart');
+
+            return {
+                name: titleElement?.textContent?.trim() || 'Unknown Product',
+                price: priceElement ? parseFloat(priceElement.textContent?.replace(/[^\d.]/g, '') || '0') : 0,
+                available: addButton instanceof HTMLButtonElement && !addButton.disabled
+            };
+        });
+
+        return {
+            id: this.config.targetUrl,
+            url: this.config.targetUrl,
+            ...productInfo
+        };
     }
 } 
