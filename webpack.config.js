@@ -2,6 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+// 主进程配置
 const mainConfig = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './src/main/main.ts',
@@ -28,6 +29,7 @@ const mainConfig = {
   }
 };
 
+// 渲染进程配置
 const rendererConfig = {
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
   entry: './src/renderer/index.tsx',
@@ -46,6 +48,10 @@ const rendererConfig = {
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.(png|jpg|gif|ico)$/,
+        type: 'asset/resource'
       },
       {
         test: /\.json$/,
@@ -69,10 +75,7 @@ const rendererConfig = {
         }
       ]
     })
-  ],
-  optimization: {
-    minimize: process.env.NODE_ENV === 'production'
-  }
+  ]
 };
 
 module.exports = [mainConfig, rendererConfig]; 

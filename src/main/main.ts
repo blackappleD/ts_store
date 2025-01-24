@@ -8,7 +8,7 @@ let configManager: ConfigManager;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
+    width: 1280,
     height: 800,
     frame: false, // 移除原生窗口框架
     webPreferences: {
@@ -20,7 +20,13 @@ function createWindow() {
   // 初始化配置管理器
   configManager = new ConfigManager();
 
-  mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+  // 在生产环境中加载打包后的文件
+  if (process.env.NODE_ENV === 'production') {
+    mainWindow.loadFile(path.join(__dirname, '../renderer/index.html'));
+  } else {
+    mainWindow.loadFile(path.join(__dirname, '../../src/renderer/index.html'));
+  }
+
   setupAllHandlers(mainWindow);
 }
 

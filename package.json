@@ -9,16 +9,16 @@
   "main": "dist/main/main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "npx rimraf dist && webpack --config webpack.config.js --mode development && concurrently \"npm run watch\" \"npm run electron-dev\"",
-    "build": "npm run build:main && npm run build:renderer",
+    "dev": "rimraf dist && webpack --config webpack.config.js --mode development && concurrently \"npm run watch\" \"npm run electron-dev\"",
+    "build": "rimraf dist && webpack --config webpack.config.js --mode production",
     "build:main": "tsc -p src/main/tsconfig.json",
     "build:renderer": "webpack --config webpack.config.js --mode production",
-    "package": "electron-builder build --win --config electron-builder.json",
+    "package": "npm run build && electron-builder --win",
     "make": "rimraf dist release && npm run build && npm run package",
     "watch": "webpack --config webpack.config.js --mode development --watch",
     "electron-dev": "wait-on dist/renderer/index.html && electron .",
     "postinstall": "electron-builder install-app-deps",
-    "clean": "npx rimraf dist release"
+    "clean": "rimraf dist release"
   },
   "dependencies": {
     "axios": "^1.6.7",
@@ -49,14 +49,16 @@
     "ts-loader": "^9.5.1",
     "typescript": "^5.3.3",
     "wait-on": "^7.2.0",
-    "webpack": "^5.90.3",
+    "webpack": "^5.97.1",
     "webpack-cli": "^5.1.4"
   },
   "build": {
-    "appId": "com.ct.taylor-swift-cd-monitor",
+    "appId": "com.taylor.swift.cd.monitor",
     "productName": "Taylor Swift CD Monitor",
+    "copyright": "Copyright © 2024 ${author}",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "buildResources": "build"
     },
     "files": [
       "dist/**/*",
@@ -71,7 +73,7 @@
           ]
         }
       ],
-      "icon": "assets/icon.ico"
+      "icon": "build/icon.ico"
     },
     "nsis": {
       "oneClick": false,
@@ -79,6 +81,7 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Taylor Swift CD Monitor"
-    }
+    },
+    "asar": true
   }
 }

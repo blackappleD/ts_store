@@ -1,35 +1,22 @@
 {
-  "appId": "com.ct.taylor-swift-cd-monitor",
+  "appId": "com.taylor.swift.cd.monitor",
   "productName": "Taylor Swift CD Monitor",
-  "copyright": "Copyright © 2024 Ct",
   "directories": {
-    "output": "release",
-    "buildResources": "build"
+    "output": "release"
   },
   "files": [
     "dist/**/*",
     "package.json"
   ],
   "win": {
-    "target": [
-      {
-        "target": "nsis",
-        "arch": ["x64"]
-      },
-      {
-        "target": "portable"
-      }
-    ],
-    "icon": "build/icon.ico",
-    "requestedExecutionLevel": "asInvoker"
+    "target": "nsis",
+    "icon": "src/assets/icon.ico"
   },
   "nsis": {
     "oneClick": false,
-    "perMachine": false,
     "allowToChangeInstallationDirectory": true,
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "shortcutName": "Taylor Swift CD Monitor"
-  },
-  "asar": true
+  }
 } 
